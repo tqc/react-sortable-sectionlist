@@ -1,0 +1,6 @@
+{
+    "extends": "tqc/react",
+    "rules": {
+        "eqeqeq": "warn"
+    }
+}
