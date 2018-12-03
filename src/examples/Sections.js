@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import SortableSectionList from "../SortableSectionList";
+import SortableSectionList from "../web/SortableSectionList";
 
 let treeData = [
     {id: "s1", title: 'Title1', data: ['item1', 'item2']},
@@ -165,6 +165,7 @@ class Sections extends Component {
             <SortableSectionList
                 className="grid"
                 numCols={4}
+                itemWidth={150}
                 itemHeight={200}
                 rootItemHeight={40}
                 toggleSection={this.toggleSection}

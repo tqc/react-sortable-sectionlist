@@ -1,7 +1,15 @@
 {
   "name": "react-sortable-sectionlist",
   "version": "0.1.0",
-  "private": true,
+  "description": "Use html react components in react-native apps",
+  "author": "Tom Clarkson <tom@tqclarkson.com> (http://tqclarkson.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tqc/react-sortable-sectionlist"
+  },
+  "bugs": {
+    "url": "https://github.com/tqc/react-sortable-sectionlist/issues"
+  },
   "dependencies": {
     "animated": "^0.2.2",
     "node-sass": "^4.10.0",

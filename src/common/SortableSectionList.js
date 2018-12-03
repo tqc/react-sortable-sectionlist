@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import Animated from "animated/lib/targets/react-dom";
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
 function flattenData(parentItem, item, index, dropTargetId, dropType, draggedItemId) {
@@ -60,122 +59,6 @@ function flattenData(parentItem, item, index, dropTargetId, dropType, draggedIte
     return result;
 }
 
-class ItemContent extends Component {
-    render() {
-        let {item} = this.props;
-        return <div>{item.title}</div>;
-    }
-}
-
-class SortableSectionListItem extends Component {
-  state = {
-      animWidth: new Animated.Value(0),
-      animOpacity: new Animated.Value(0),
-      animHeight: new Animated.Value(0)
-  };
-  componentDidMount() {
-      console.log("item mounted");
-      Animated.timing(this.state.animOpacity, {toValue: 1, duration: 500}).start();
-      Animated.timing(this.state.animWidth, {toValue: 150, duration: 500}).start();
-      Animated.timing(this.state.animHeight, {toValue: this.props.itemHeight, duration: 500}).start();
-  }
-  componentDidUpdate() {
-      if (this.props.item.removing) {
-          Animated.timing(this.state.animOpacity, {toValue: 0, duration: 500}).start();
-          Animated.timing(this.state.animWidth, {toValue: 0, duration: 500}).start();
-          Animated.timing(this.state.animHeight, {toValue: 0, duration: 500}).start();
-      }
-      else {
-          Animated.timing(this.state.animOpacity, {toValue: 1, duration: 500}).start();
-          Animated.timing(this.state.animWidth, {toValue: 150, duration: 500}).start();
-          Animated.timing(this.state.animHeight, {toValue: this.props.itemHeight, duration: 500}).start();
-      }
-  }
-  render() {
-      let {item, toggleSection} = this.props;
-      let HeaderComponent = this.props.headerComponent || ItemContent;
-      let ItemComponent = this.props.itemComponent || ItemContent;
-      if (item.id === "placeholder") {
-          return (
-              <div className={"ssli ssli-" + item.level}
-                  style={{
-                      width: item.removing ? 0 : 150,
-                      height: item.removing ? 0 : this.props.itemHeight,
-                      //backgroundColor: item.removing ? "red" : "transparent"
-                  }}
-              >
-              </div>
-          );
-      }
-      if (item.level === 0) {
-          return (
-              <div className={"ssli ssli-" + item.level}
-                  onClick={() => toggleSection(item)}
-              >
-                  <HeaderComponent {...this.props} />
-              </div>
-          );
-      }
-      else if (item.level >= 0) {
-          return (
-              <Animated.div className={"ssli ssli-" + item.level}
-                  style={{
-                      //width: item.removing ? width : width,
-                      opacity: this.state.animOpacity,
-                      width: this.state.animWidth,
-                      //            width: item.removing ? 0 : 150,
-                      height: this.state.animHeight,
-                      //            backgroundColor: item.removing ? "red" : "transparent"
-                      //marginLeft: isDropTarget ? 150 : 0
-                  }}
-                  onClick={() => toggleSection(item)}
-              >
-                  <ItemComponent {...this.props} />
-              </Animated.div>
-          );
-      }
-  }
-}
-
-
-class DraggedItem extends Component {
-  state = {
-      animOpacity: new Animated.Value(0),
-  };
-  componentDidMount() {
-      console.log("item mounted");
-      Animated.timing(this.state.animOpacity, {toValue: 1, duration: 500}).start();
-  }
-  componentDidUpdate() {
-  /*  if (this.props.item.removing) {
-      Animated.timing(this.state.animOpacity, {toValue: 0, duration: 500}).start();
-    }
-    else {
-      Animated.timing(this.state.animOpacity, {toValue: 1, duration: 500}).start();
-    }*/
-  }
-  render() {
-      let {item, toggleSection, numCols, isDropTarget} = this.props;
-      let ItemComponent = this.props.itemComponent || ItemContent;
-      let width = 600 / numCols;
-
-
-      return (
-          <Animated.div className={"draggeditem"}
-              style={{
-                  left: item.x,
-                  top: item.y,
-                  opacity: this.state.animOpacity,
-              }}
-          >
-              <ItemComponent {...this.props} />
-          </Animated.div>
-      );
-  }
-}
-
-
-
 class SortableSectionList extends Component {
     static propTypes = {
         className: PropTypes.string,
@@ -192,9 +75,6 @@ class SortableSectionList extends Component {
     }
     constructor() {
         super();
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseMove = this.onMouseMove.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
         this.state = {
             dropTargetIndex: null,
         };
@@ -211,7 +91,7 @@ class SortableSectionList extends Component {
             let nextItem = this.flattenedList[++nextIndex];
             while (nextItem && nextItem.removing) nextItem = this.flattenedList[++nextIndex];
             let itemHeight = this.props.itemHeight;
-            let itemWidth = 150;
+            let itemWidth = this.props.itemWidth;
 
             if (item.level === 0) {
                 parentSectionIndex = i;
@@ -240,7 +120,7 @@ class SortableSectionList extends Component {
                 itemY += itemHeight;
             } else {
                 itemX += itemWidth;
-                if (itemX > 500 || (nextItem && nextItem.level === 0)) {
+                if (itemX >= itemWidth * this.props.numCols || (nextItem && nextItem.level === 0)) {
                     itemX = 0;
                     itemY += itemHeight;
                 }
@@ -248,11 +128,7 @@ class SortableSectionList extends Component {
         }
         return null;
     }
-
-    onMouseDown(e) {
-        if (this.state.draggedItem) return;
-        let x = e.pageX - this.div.offsetLeft;
-        let y = e.pageY - this.div.offsetTop;
+    startDrag(x, y) {
         let target = this.itemAt(x, y);
         console.log(target);
         if (!target) return;
@@ -265,21 +141,15 @@ class SortableSectionList extends Component {
         };
         if (draggedItem.level === 0) return;
         this.setState({draggedItem: draggedItem});
-        this.setState({dropTargetIndex: target.index});
-
+        this.continueDrag(x, y, draggedItem);
     }
-    onMouseMove(e) {
-        if (!this.state.draggedItem) return;
-        let x = e.pageX - this.div.offsetLeft;
-        let y = e.pageY - this.div.offsetTop;
-
+    continueDrag(x, y, initialDraggedItem = this.state.draggedItem) {
         let draggedItem = {
-            ...this.state.draggedItem,
-            x: x - this.state.draggedItem.xOffset,
-            y: y - this.state.draggedItem.xOffset,
+            ...initialDraggedItem,
+            x: x - initialDraggedItem.xOffset,
+            y: y - initialDraggedItem.xOffset,
         };
         this.setState({draggedItem: draggedItem});
-
 
         let target = this.itemAt(x, y);
         let dropTargetId = null;
@@ -295,29 +165,29 @@ class SortableSectionList extends Component {
         else {
             dropTargetItem = target.item;
             dropTargetId = target.item.id;
-            dropType = this.props.willAcceptDrop(target.item, this.state.draggedItem, target.xOffset, target.yOffset, this.props.itemWidth, this.props.itemHeight);
+            dropType = this.props.willAcceptDrop(target.item, draggedItem, target.xOffset, target.yOffset, this.props.itemWidth, this.props.itemHeight);
         }
 
 
         if (dropTargetId !== this.state.dropTargetId || dropType !== this.state.dropType) {
-            this.setState({dropTargetId, dropTargetItem, dropType});
+            this.setState({draggedItem, dropTargetId, dropTargetItem, dropType});
+        }
+        else {
+            this.setState({draggedItem});
         }
 
         console.log(dropTargetId + ": " + dropType);
     }
-    onMouseUp(e) {
-        if (!this.state.draggedItem) return;
-        if (!this.state.dropType) return;
-
+    endDrag(x, y) {
         this.props.handleMove(this.state.dropTargetItem, this.state.draggedItem, this.state.dropType);
         this.setState({draggedItem: null, dropTargetId: null, dropType: null});
     }
-    render() {
+    updateFlattenedList() {
         let now = new Date().getTime();
         let {sections} = this.props;
         let {draggedItem, dropTargetId, dropType} = this.state;
+
         let flattenedList = [];
-        let draggedElement = null;
         let oldList = (this.flattenedList || []);
         for (let i = 0; i < sections.length; i++) {
             flattenedList.push.apply(flattenedList, flattenData(null, sections[i], i, dropTargetId, dropType, draggedItem && draggedItem.id));
@@ -371,24 +241,10 @@ class SortableSectionList extends Component {
 
         console.log(removedIds);
 
-
-        if (draggedItem) {
-            draggedElement = (<DraggedItem {...this.props} key={draggedItem.id} item={draggedItem} />);
-        }
-
-        // console.log(flattenedList);
-        return (
-            <div
-                ref={(el) => { this.div = el; }}
-                className={"sectionlist " + this.props.className}
-                onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onMouseUp={this.onMouseUp}
-            >
-                {this.flattenedList.map((item, index) => <SortableSectionListItem {...this.props} isDropTarget={index === this.state.dropTargetIndex} key={item.id} item={item} />)}
-                {draggedElement}
-            </div>
-        );
+        return this.flattenedList;
+    }
+    render() {
+        return null;
     }
 }
 

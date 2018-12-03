@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import SortableSectionList from "../SortableSectionList";
+import {SortableSectionList} from "../web";
 
 let treeData = [
     {id: "s1", title: 'Title1', data: ['item1', 'item2']},
@@ -65,9 +65,9 @@ class TreeDemo extends Component {
     }
     willAcceptDrop(targetItem, droppedItem, x, y, w, h) {
         if (targetItem.level === 0) return "into";
-        if (x < 75) return "before";
-        //else if (x >= 50  && x < 100) return "into";
-        else if (x >= 75) return "after";
+        if (y < 7) return "before";
+        else if (y >= 7 && y < 23) return "into";
+        else if (y >= 23) return "after";
         else return null;
     }
     handleMove(targetItem, droppedItem, dropType) {
@@ -139,6 +139,7 @@ class TreeDemo extends Component {
             <SortableSectionList
                 className="tree"
                 numCols={1}
+                itemWidth={200}
                 itemHeight={30}
                 rootItemHeight={30}
                 toggleSection={this.toggleTreeNode}
