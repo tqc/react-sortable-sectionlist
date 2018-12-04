@@ -54,11 +54,16 @@
   }
 }
 
+.sslr {
+  display: flex;
+  flex-wrap: no-wrap;
+  flex-direction: row;
+}
 
 .sectionlist.grid {
   position: relative;
   user-select: none;
-  display: flex;
+  //display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   .ssli {

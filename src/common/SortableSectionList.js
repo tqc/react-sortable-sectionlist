@@ -32,12 +32,12 @@ function flattenData(parentItem, item, index, dropTargetId, dropType, draggedIte
             parentId
         });
 
-    if (!item.data || item.data.length === 0 || item.collapsed) {
+    if (!item.children || item.children.length === 0 || item.collapsed) {
     // nothing to add
     }
     else {
-        for (let i = 0; i < item.data.length; i++) {
-            result.push.apply(result, flattenData(result[0], item.data[i], i, dropTargetId, dropType, draggedItemId));
+        for (let i = 0; i < item.children.length; i++) {
+            result.push.apply(result, flattenData(result[0], item.children[i], i, dropTargetId, dropType, draggedItemId));
         }
     }
     if (dropTargetId === item.id && dropType === "into" && !item.collapsed) {
@@ -54,6 +54,91 @@ function flattenData(parentItem, item, index, dropTargetId, dropType, draggedIte
             title: "Placeholder",
             level: itemLevel
         });
+    }
+
+    return result;
+}
+
+function getRowsForTree(originalTree, numCols, headerHeight, itemHeight, itemWidth) {
+    let rows = []
+    function pushRow(items, parentItemId, index, level) {
+        let row = {
+            parentItemId,
+            items,
+            level
+        };
+        if (items.length === 1 && (numCols === 1 || !parentItemId)) {
+            // single column or header - push item as a row
+            row.id = items[0].id;
+        }
+        else {
+            row.id = (parentItemId || "row") + "-" + index;
+        }
+        if (!parentItemId) {
+            row.height = headerHeight;
+        }
+        else {
+            row.height = itemHeight;
+        }
+        rows.push(row);
+    }
+
+    function pushRowsForNodes(nodes, level, parentItemId) {
+        if (!nodes || nodes.length === 0) return;
+        let currentRow = [];
+        let rowIndex = 0;
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            currentRow.push(node);
+
+            let nextNode = nodes[i + 1];
+            let rowIsFull = currentRow.length >= numCols || !parentItemId;
+            if (rowIsFull || !nextNode) {
+                pushRow(currentRow, parentItemId, ++rowIndex, level);
+                for (let j = 0; j < currentRow.length; j++) {
+                    let item = currentRow[j];
+                    if (item.children && !item.collapsed) {
+                        pushRowsForNodes(item.children, level + 1, item.id);
+                    }
+                }
+                currentRow = [];
+            }
+
+        }
+    }
+
+    pushRowsForNodes(originalTree, 0);
+    return rows;
+}
+
+function rowAt(rows, x, y) {
+    let itemY = 0;
+    for (let i = 0; i < rows.length; i++) {
+        let row = rows[i];
+        if (itemY + row.height > y) return {
+            row,
+            rowIndex: i,
+            yOffset: y - itemY
+        };
+        itemY += row.height;
+    }
+}
+
+function itemAt(rows, x, y, itemWidth) {
+    let result = rowAt(rows, x, y);
+    if (!result.row) return result;
+
+    if (result.row.items.length === 1) {
+        result.item = result.row.items[0]
+        result.xOffset = x;
+        result.indexInRow = 0;
+        return result;
+    }
+    else {
+        let itemIndex = Math.min(Math.floor(x / itemWidth), result.row.items.length - 1);
+        result.item = result.row.items[itemIndex];
+        result.xOffset = x - itemIndex * itemWidth;
+        result.indexInRow = itemIndex;
     }
 
     return result;
@@ -78,6 +163,7 @@ class SortableSectionList extends Component {
         this.state = {
             dropTargetIndex: null,
         };
+        this.rows = [];
     }
     itemAt(x, y) {
         let itemX = 0;
@@ -129,11 +215,14 @@ class SortableSectionList extends Component {
         return null;
     }
     startDrag(x, y) {
-        let target = this.itemAt(x, y);
+
+        let target = itemAt(this.rows, x, y, this.props.itemWidth);
         console.log(target);
         if (!target) return;
         let draggedItem = {
             ...target.item,
+            parentId: target.row.parentItemId,
+            level: target.row.level,
             x: x - target.xOffset,
             y: y - target.yOffset,
             xOffset: target.xOffset,
@@ -151,16 +240,14 @@ class SortableSectionList extends Component {
         };
         this.setState({draggedItem: draggedItem});
 
-        let target = this.itemAt(x, y);
+        let target = itemAt(this.rows, x, y, this.props.itemWidth);
+        console.log(target);
+
         let dropTargetId = null;
         let dropTargetItem = null;
         let dropType = null;
         if (!target || !target.item) {
             // not accepting drop
-        }
-        else if (target.item.id === "placeholder") {
-            // no change?
-            return;
         }
         else {
             dropTargetItem = target.item;
@@ -182,66 +269,65 @@ class SortableSectionList extends Component {
         this.props.handleMove(this.state.dropTargetItem, this.state.draggedItem, this.state.dropType);
         this.setState({draggedItem: null, dropTargetId: null, dropType: null});
     }
-    updateFlattenedList() {
+    updateRows() {
         let now = new Date().getTime();
         let {sections} = this.props;
         let {draggedItem, dropTargetId, dropType} = this.state;
 
-        let flattenedList = [];
-        let oldList = (this.flattenedList || []);
-        for (let i = 0; i < sections.length; i++) {
-            flattenedList.push.apply(flattenedList, flattenData(null, sections[i], i, dropTargetId, dropType, draggedItem && draggedItem.id));
+        let oldRows = this.rows || [];
+        let oldRowMap = [];
+        for (let i = 0; i < oldRows.length; i++) {
+            oldRowMap[oldRows[i].id] = oldRows[i];
         }
 
-        let currentIds = flattenedList.map(o => o.id);
-        let oldIds = oldList.map(o => o.id);
-        let removedIds = oldIds.filter(id => currentIds.indexOf(id) < 0);
-        let addedIds = oldIds.filter(id => currentIds.indexOf(id) < 0);
+        let newRows = getRowsForTree(sections, this.props.numCols || 1, this.props.headerHeight || 40, this.props.itemHeight || 200, this.props.itemWidth || 150);
 
+        let allRows = [];
+
+        let oldIds = oldRows.map(o => o.id);
+        let currentIds = newRows.map(o => o.id);
         let i = 0; let j = 0;
 
-        this.flattenedList = [];
-
-        while (i < currentIds.length) {
-            if (addedIds.indexOf(currentIds[i]) >= 0) {
+        while (i < newRows.length) {
+            if (!oldRowMap[newRows[i].id]) {
                 // new item
-                this.flattenedList.push(flattenedList[i]);
+                allRows.push(newRows[i]);
                 i++;
             }
             else {
                 // get to this item in old list, recording anything removed
                 while (j < oldIds.length && oldIds[j] !== currentIds[i]) {
-                    if (currentIds.indexOf(oldIds[j]) < 0 && !(oldList[j].removed < now - 1000)) {
-                        this.flattenedList.push({
+                    if (currentIds.indexOf(oldIds[j]) < 0 && !(oldRows[j].removed < now - 1000)) {
+                        allRows.push({
                             removed: now,
-                            ...oldList[j],
+                            ...oldRows[j],
                             removing: true
                         });
                     }
                     j++;
                 }
-            }
 
-            this.flattenedList.push(flattenedList[i]);
-            i++;
-            j++;
+                allRows.push(newRows[i]);
+                // todo: record changes within the row
+                i++;
+                j++;
+            }
         }
 
-
         while (j < oldIds.length) {
-            if (currentIds.indexOf(oldIds[j]) < 0 && !(oldList[j].removed < now - 1000)) {
-                this.flattenedList.push({
+            if (currentIds.indexOf(oldIds[j]) < 0 && !(oldRows[j].removed < now - 1000)) {
+                allRows.push({
                     removed: now,
-                    ...oldList[j],
+                    ...oldRows[j],
                     removing: true
                 });
             }
             j++;
         }
 
-        console.log(removedIds);
-
-        return this.flattenedList;
+        this.rows = allRows;
+        console.log(allRows);
+        return allRows;
     }
     render() {
         return null;

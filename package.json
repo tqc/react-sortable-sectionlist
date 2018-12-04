@@ -1,7 +1,7 @@
 {
   "name": "react-sortable-sectionlist",
-  "version": "0.1.0",
-  "description": "Use html react components in react-native apps",
+  "version": "0.1.2",
+  "description": "A sortable / draggable sectionlist component for react and react native",
   "author": "Tom Clarkson <tom@tqclarkson.com> (http://tqclarkson.com)",
   "repository": {
     "type": "git",
@@ -33,6 +33,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "eslint-config-tqc": "^1.0.11"
+    "eslint-config-tqc": "^1.0.13"
   }
 }

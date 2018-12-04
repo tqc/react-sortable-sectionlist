@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import SortableSectionList from "../common/SortableSectionList";
 import DraggedItem from "./DraggedItem";
-import SortableSectionListItem from "./SortableSectionListItem";
+import SortableSectionListRow from "./SortableSectionListRow";
 
 export default class SortableSectionListWeb extends SortableSectionList {
     constructor() {
@@ -30,7 +30,7 @@ export default class SortableSectionListWeb extends SortableSectionList {
     }
     render() {
         let {draggedItem} = this.state;
-        let flattenedList = this.updateFlattenedList();
+        let rows = this.updateRows();
 
         return (
             <div
@@ -40,7 +40,7 @@ export default class SortableSectionListWeb extends SortableSectionList {
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
             >
-                {flattenedList.map((item, index) => <SortableSectionListItem {...this.props} isDropTarget={index === this.state.dropTargetIndex} key={item.id} item={item} />)}
+                {rows.map((row, index) => <SortableSectionListRow {...this.props} isDropTarget={this.state.dropTarget && this.state.dropTarget.rowIndex === index} key={row.id} row={row} />)}
                 <DraggedItem {...this.props} item={draggedItem} />
             </div>
         );

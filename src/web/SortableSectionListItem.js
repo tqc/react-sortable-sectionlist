@@ -39,11 +39,11 @@ export default class SortableSectionListItemWeb extends SortableSectionListItem 
         );
     }
     renderItem() {
-        let {item, toggleSection} = this.props;
+        let {item, toggleSection, level} = this.props;
         let ItemComponent = this.props.itemComponent || ItemContent;
 
         return (
-            <Animated.div className={"ssli ssli-" + item.level}
+            <Animated.div className={"ssli ssli-" + level}
                 style={{
                     //width: item.removing ? width : width,
                     opacity: this.state.animOpacity,

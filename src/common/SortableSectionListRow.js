@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 
-export default class SortableSectionListItem extends Component {
+export default class SortableSectionListRow extends Component {
     constructor() {
         super();
         this.state = this.getInitialAnimatedState();
@@ -18,7 +18,7 @@ export default class SortableSectionListItem extends Component {
         this.animateAdd();
     }
     componentDidUpdate() {
-        if (this.props.item.removing) {
+        if (this.props.row.removing) {
             this.animateRemove();
         }
         else {
@@ -35,18 +35,6 @@ export default class SortableSectionListItem extends Component {
         throw new Error("renderPlaceholder not implemented");
     }
     render() {
-        let {item, level} = this.props;
-        if (item.id === "placeholder") {
-            return this.renderPlaceholder();
-        }
-        if (level === 0) {
-            return this.renderHeader();
-        }
-        else if (level >= 0) {
-            return this.renderItem();
-        }
-        else {
-            return null;
-        }
+        return null;
     }
 }
