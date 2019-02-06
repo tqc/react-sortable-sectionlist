@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {SortableSectionList} from "../web";
 
-import {treeData, mutatedTree, expandStringItems} from "./ExampleModel";
+import {treeData, mutatedTree, expandStringItems, moveItem} from "./ExampleModel";
 
 
 
@@ -45,27 +45,16 @@ class TreeDemo extends Component {
         this.setState({treeNodes: newData});
     }
     willAcceptDrop(targetItem, droppedItem, x, y, w, h) {
-        if (targetItem.level === 0) return "into";
+        if (targetItem.id === droppedItem.id) return null;
+        if (targetItem.parentId === undefined) return "into";
         if (y < 7) return "before";
         else if (y >= 7 && y < 23) return "into";
         else if (y >= 23) return "after";
         else return null;
     }
     handleMove(targetItem, droppedItem, dropType) {
-
         console.log("Dropping " + droppedItem.title + " " + dropType + " " + targetItem.title);
-
-        let fromSectionId = droppedItem.parentId;
-        let toSectionId = null;
-        if (dropType === null) return;
-        if (dropType === "into") {
-            toSectionId = targetItem.id;
-        }
-        else {
-            toSectionId = targetItem.parentId;
-        }
-        return;
-
+        this.setState({treeNodes: moveItem(this.state.treeNodes, targetItem, droppedItem, dropType)});
     }
     render() {
         let {treeNodes} = this.state;

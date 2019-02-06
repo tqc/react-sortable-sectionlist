@@ -25,7 +25,6 @@ export default class SortableSectionListWeb extends SortableSectionList {
     }
     onMouseUp(e) {
         if (!this.state.draggedItem) return;
-        if (!this.state.dropType) return;
         this.endDrag();
     }
     render() {

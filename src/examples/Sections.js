@@ -50,7 +50,7 @@ class Sections extends Component {
         this.setState({sections: newData});
     }
     willAcceptDrop(targetItem, droppedItem, x, y) {
-        if (targetItem.level === 0) return "into";
+        if (targetItem.parentId === undefined) return "into";
         if (x < 75) return "before";
         //else if (x >= 50  && x < 100) return "into";
         else if (x >= 75) return "after";

@@ -60,7 +60,7 @@ function flattenData(parentItem, item, index, dropTargetId, dropType, draggedIte
 }
 
 function getRowsForTree(originalTree, numCols, headerHeight, itemHeight, itemWidth) {
-    let rows = []
+    let rows = [];
     function pushRow(items, parentItemId, index, level) {
         let row = {
             parentItemId,
@@ -80,7 +80,9 @@ function getRowsForTree(originalTree, numCols, headerHeight, itemHeight, itemWid
         else {
             row.height = itemHeight;
         }
-        rows.push(row);
+        if (row.height !== 0) {
+            rows.push(row);
+        }
     }
 
     function pushRowsForNodes(nodes, level, parentItemId) {
@@ -266,7 +268,9 @@ class SortableSectionList extends Component {
         console.log(dropTargetId + ": " + dropType);
     }
     endDrag(x, y) {
-        this.props.handleMove(this.state.dropTargetItem, this.state.draggedItem, this.state.dropType);
+        if (this.state.dropType) {
+            this.props.handleMove(this.state.dropTargetItem, this.state.draggedItem, this.state.dropType);
+        }
         this.setState({draggedItem: null, dropTargetId: null, dropType: null});
     }
     updateRows() {
@@ -280,7 +284,7 @@ class SortableSectionList extends Component {
             oldRowMap[oldRows[i].id] = oldRows[i];
         }
 
-        let newRows = getRowsForTree(sections, this.props.numCols || 1, this.props.headerHeight || 40, this.props.itemHeight || 200, this.props.itemWidth || 150);
+        let newRows = getRowsForTree(sections, this.props.numCols || 1, this.props.rootItemHeight, this.props.itemHeight || 200, this.props.itemWidth || 150);
 
         let allRows = [];
 
