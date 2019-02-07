@@ -1,64 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-function flattenData(parentItem, item, index, dropTargetId, dropType, draggedItemId) {
-
-    let parentId = parentItem ? parentItem.id : null;
-    let idPrefix = parentItem ? parentItem.id + "-" : "";
-    let itemLevel = parentItem ? parentItem.level + 1 : 0;
-
-    if (typeof item !== "object") {
-        item = {
-            id: idPrefix + index,
-            title: item,
-            level: itemLevel,
-            parentId: parentId
-        };
-    }
-
-    let result = [];
-    if (dropTargetId === item.id && dropType === "before") {
-        result.push({
-            id: "placeholder",
-            title: "Placeholder",
-            level: itemLevel
-        });
-    }
-
-    if (item.id !== draggedItemId)
-        result.push({
-            ...item,
-            level: itemLevel,
-            parentId
-        });
-
-    if (!item.children || item.children.length === 0 || item.collapsed) {
-    // nothing to add
-    }
-    else {
-        for (let i = 0; i < item.children.length; i++) {
-            result.push.apply(result, flattenData(result[0], item.children[i], i, dropTargetId, dropType, draggedItemId));
-        }
-    }
-    if (dropTargetId === item.id && dropType === "into" && !item.collapsed) {
-        result.push({
-            id: "placeholder",
-            title: "Placeholder",
-            level: itemLevel + 1
-        });
-    }
-
-    if (dropTargetId === item.id && dropType === "after") {
-        result.push({
-            id: "placeholder",
-            title: "Placeholder",
-            level: itemLevel
-        });
-    }
-
-    return result;
-}
-
 function getRowsForTree(originalTree, numCols, headerHeight, itemHeight, itemWidth) {
     let rows = [];
     function pushRow(items, parentItemId, index, level) {
