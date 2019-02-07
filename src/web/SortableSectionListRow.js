@@ -1,11 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Animated from "animated/lib/targets/react-dom";
 import SortableSectionListRow from "../common/SortableSectionListRow";
 
 import SortableSectionListItem from "./SortableSectionListItem";
 
 export default class SortableSectionListRowWeb extends SortableSectionListRow {
+    static propTypes = SortableSectionListRow.propTypes;
     getInitialAnimatedState() {
         return {
             animOpacity: new Animated.Value(0),

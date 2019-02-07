@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import PlaceholderItem from "../common/PlaceholderItem";
 
 export default class PlaceholderItemWeb extends PlaceholderItem {
+    static propTypes = PlaceholderItem.propTypes;
     render() {
         let {item} = this.props;
         return (

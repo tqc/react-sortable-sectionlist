@@ -10,8 +10,7 @@ import {sectionData, expandStringItems, moveItem, mutatedTree} from "./ExampleMo
 class SectionHeader extends Component {
     static propTypes = {
         item: PropTypes.shape({
-        }).isRequired,
-        toggleSection: PropTypes.func,
+        }).isRequired
     }
     render() {
         let {item} = this.props;
@@ -22,7 +21,10 @@ class SectionHeader extends Component {
 }
 
 class ThumbnailItem extends Component {
-
+    static propTypes = {
+        item: PropTypes.shape({
+        }).isRequired
+    }
     render() {
         let {item} = this.props;
         return (

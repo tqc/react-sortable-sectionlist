@@ -1,6 +1,6 @@
 {
   "name": "react-sortable-sectionlist",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A sortable / draggable sectionlist component for react and react native",
   "author": "Tom Clarkson <tom@tqclarkson.com> (http://tqclarkson.com)",
   "homepage": "https://tqc.github.io/react-sortable-sectionlist",

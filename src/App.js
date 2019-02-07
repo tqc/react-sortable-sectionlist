@@ -11,13 +11,23 @@ class App extends Component {
         return (
             <div className="App">
                 <h1>React Sortable Section List</h1>
-                <p>Intro...</p>
-                <h2>Tree</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, </p>
+                <p>quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <hr/>
+                <h2>Demo</h2>
                 <p>As a tree..</p>
-                <Tree />
-                <h2>Grid</h2>
                 <p>As a grid...</p>
-                <Sections />
+                <hr/>
+                <div className="demorow">
+                    <div className="treedemo">
+                        <Tree />
+                    </div>
+                    <div className="griddemo">
+                        <Sections />
+                    </div>
+                </div>
+                <hr/>
+
             </div>
 
         );

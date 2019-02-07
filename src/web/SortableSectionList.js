@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import SortableSectionList from "../common/SortableSectionList";
 import DraggedItem from "./DraggedItem";
 import SortableSectionListRow from "./SortableSectionListRow";
 
 export default class SortableSectionListWeb extends SortableSectionList {
+    static propTypes = SortableSectionList.propTypes;
     constructor() {
         super();
         this.onMouseDown = this.onMouseDown.bind(this);

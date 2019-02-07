@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import Animated from "animated/lib/targets/react-dom";
 import DraggedItem from "../common/DraggedItem";
 import ItemContent from "./ItemContent";
 
 export default class DraggedItemWeb extends DraggedItem {
+    static propTypes = DraggedItem.propTypes;
     getInitialAnimatedState() {
         return {
             animOpacity: new Animated.Value(0),
@@ -23,7 +23,7 @@ export default class DraggedItemWeb extends DraggedItem {
 
     }
     render() {
-        let {item, toggleSection, numCols, isDropTarget} = this.props;
+        let {item} = this.props;
         let ItemComponent = this.props.itemComponent || ItemContent;
 
         if (!item) {

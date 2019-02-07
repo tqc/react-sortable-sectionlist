@@ -131,7 +131,7 @@ function itemAt(rows, x, y, itemWidth) {
     if (!result.row) return result;
 
     if (result.row.items.length === 1) {
-        result.item = result.row.items[0]
+        result.item = result.row.items[0];
         result.xOffset = x;
         result.indexInRow = 0;
         return result;
@@ -151,6 +151,7 @@ class SortableSectionList extends Component {
         className: PropTypes.string,
         numCols: PropTypes.number.isRequired,
         itemHeight: PropTypes.number.isRequired,
+        itemWidth: PropTypes.number.isRequired,
         rootItemHeight: PropTypes.number.isRequired,
         toggleSection: PropTypes.func.isRequired,
         willAcceptDrop: PropTypes.func.isRequired,
@@ -276,7 +277,6 @@ class SortableSectionList extends Component {
     updateRows() {
         let now = new Date().getTime();
         let {sections} = this.props;
-        let {draggedItem, dropTargetId, dropType} = this.state;
 
         let oldRows = this.rows || [];
         let oldRowMap = [];

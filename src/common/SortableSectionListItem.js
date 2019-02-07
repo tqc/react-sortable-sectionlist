@@ -1,8 +1,14 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
 
 export default class SortableSectionListItem extends Component {
+    static propTypes = {
+        item: PropTypes.shape({
+            removing: PropTypes.bool
+        }).isRequired,
+        level: PropTypes.number.isRequired
+    }
     constructor() {
         super();
         this.state = this.getInitialAnimatedState();

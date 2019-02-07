@@ -1,11 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Animated from "animated/lib/targets/react-dom";
 import SortableSectionListItem from "../common/SortableSectionListItem";
 import ItemContent from "./ItemContent";
 import PlaceholderItem from "./PlaceholderItem";
 
 export default class SortableSectionListItemWeb extends SortableSectionListItem {
+    static propTypes = SortableSectionListItem.propTypes;
     getInitialAnimatedState() {
         return {
             animWidth: new Animated.Value(0),
@@ -28,10 +28,10 @@ export default class SortableSectionListItemWeb extends SortableSectionListItem 
         return (<PlaceholderComponent {...this.props} />);
     }
     renderHeader() {
-        let {item, toggleSection} = this.props;
+        let {item, level, toggleSection} = this.props;
         let HeaderComponent = this.props.headerComponent || ItemContent;
         return (
-            <div className={"ssli ssli-" + item.level}
+            <div className={"ssli ssli-" + level}
                 onClick={() => toggleSection(item)}
             >
                 <HeaderComponent {...this.props} />
